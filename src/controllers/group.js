@@ -1,7 +1,5 @@
 import { Errors, Responses } from "../Responses/response";
-import { StatusCodes, validatePayload } from "../services";
 import { ServerException } from "../exceptions/exception";
-import { CONSTANTS, LABELS } from "../services/constants";
 import {
   createGroup,
   deleteGroupById,
@@ -10,6 +8,9 @@ import {
   updateGroup,
 } from "../models/group";
 import { deleteTasksByGroupId } from "../models/task";
+import { getUserById } from "../models/user";
+import { StatusCodes, validatePayload } from "../services";
+import { CONSTANTS, LABELS } from "../services/constants";
 const { PAGE, PAGE_SIZE } = CONSTANTS;
 
 export const addGroup = async (req, res) => {
@@ -125,6 +126,46 @@ export const getGroup = async (req, res) => {
       res.status(StatusCodes.NOT_FOUND).json({
         status: false,
         message: `Group ${Responses.not_found}`,
+      });
+    }
+  } catch (error) {
+    return new ServerException(Errors.internal_error).get(res);
+  }
+};
+export const getMembers = async (req, res) => {
+  try {
+    let { id } = req.params;
+    if (id) {
+      const group = await getGroupById(id);
+      if (group) {
+        const memberData = await Promise.all(
+          group.members.map(async (member) => {
+            let { _id } = member;
+            const user = await getUserById(_id);
+            if (user) {
+              let { fullName, email } = user;
+              return {
+                _id,
+                fullName,
+                email,
+              };
+            }
+          })
+        );
+        res.status(StatusCodes.OK).json({
+          status: true,
+          data: memberData,
+        });
+      } else {
+        res.status(StatusCodes.NOT_FOUND).json({
+          status: false,
+          message: `Group ${Responses.not_found}`,
+        });
+      }
+    } else {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        status: false,
+        message: `${Responses.kindly_provide} group id`,
       });
     }
   } catch (error) {
