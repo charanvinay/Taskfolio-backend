@@ -1,7 +1,9 @@
-
 export class BaseException extends Error {
   constructor(message, status_code, error_type) {
     super();
+    this.message = message;
+    this.status_code = status_code;
+    this.error_type = error_type;
   }
   get(res) {
     const { message, error_type } = this;
