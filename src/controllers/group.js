@@ -40,35 +40,33 @@ export const addGroup = async (req, res) => {
 };
 export const editGroup = async (req, res) => {
   const { id } = req.params;
-  const { title, createdBy, members } = req.body;
-  const payload = { title, createdBy, members };
-  const { isValid, invalidKey } = validatePayload(payload);
+  const { title = "", members = [] } = req.body;
   try {
-    if (isValid) {
-      let filter = { _id: id };
-      const groups = await getGroups(filter);
-      if (groups && groups?.length) {
-        const group = await updateGroup(filter, payload);
-        if (group) {
-          res.status(StatusCodes.OK).json({
-            status: true,
-            message: Responses.group_updated,
-          });
-        }
-      } else {
-        res
-          .status(StatusCodes.NOT_FOUND)
-          .json({ status: false, message: `Group ${Responses.not_found}` });
+    let filter = { _id: id };
+    const group = await getGroupById(id);
+    if (group && group["_id"]) {
+      let payload = {};
+      if (title) {
+        payload["title"] = title;
+      }
+      if (members && members.length) {
+        const uniqueMembers = members.filter((member) => !group.members.includes(member));
+        payload["members"] = [...group.members, ...uniqueMembers];
+      }      
+      const resp = await updateGroup(filter, payload);
+      if (resp) {
+        res.status(StatusCodes.OK).json({
+          status: true,
+          message: Responses.group_updated,
+        });
       }
     } else {
-      res.status(StatusCodes.BAD_REQUEST).json({
-        status: false,
-        message: `${Responses.kindly_provide} ${
-          LABELS["GROUP"][invalidKey] || ""
-        }`,
-      });
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ status: false, message: `Group ${Responses.not_found}` });
     }
   } catch (error) {
+    console.log(error);
     return new ServerException(Errors.internal_error).get(res);
   }
 };
