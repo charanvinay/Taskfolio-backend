@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Errors, Responses } from "../Responses/response";
 import { ServerException } from "../exceptions/exception";
 import {
@@ -50,9 +51,11 @@ export const editGroup = async (req, res) => {
         payload["title"] = title;
       }
       if (members && members.length) {
-        const uniqueMembers = members.filter((member) => !group.members.includes(member));
+        const uniqueMembers = members.filter(
+          (member) => !group.members.includes(member)
+        );
         payload["members"] = [...group.members, ...uniqueMembers];
-      }      
+      }
       const resp = await updateGroup(filter, payload);
       if (resp) {
         res.status(StatusCodes.OK).json({
@@ -167,6 +170,43 @@ export const getMembers = async (req, res) => {
       });
     }
   } catch (error) {
+    return new ServerException(Errors.internal_error).get(res);
+  }
+};
+export const leaveGroup = async (req, res) => {
+  try {
+    let { id, uid } = req.params;
+    let filter = { _id: id };
+    if (id && uid) {
+      const group = await getGroupById(id);
+      console.log(group, uid);
+      if (group) {
+        let payload = {};
+        const uidObjectId = new mongoose.Types.ObjectId(uid);
+        // Filter out the member with the specified uid
+        payload["members"] = group.members.filter((member) => member.toString() !== uidObjectId.toString());
+        console.log(payload);
+        const resp = await updateGroup(filter, payload);
+        if (resp) {
+          res.status(StatusCodes.OK).json({
+            status: true,
+            message: Responses.group_leaved,
+          });
+        }
+      } else {
+        res.status(StatusCodes.NOT_FOUND).json({
+          status: false,
+          message: `Group ${Responses.not_found}`,
+        });
+      }
+    } else {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        status: false,
+        message: `${Responses.kindly_provide} group id along with user id`,
+      });
+    }
+  } catch (error) {
+    console.log(error);
     return new ServerException(Errors.internal_error).get(res);
   }
 };

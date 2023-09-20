@@ -15,6 +15,7 @@ export const Responses = {
   group_created: "Group created successfully!!!",
   group_updated: "Group updated successfully!!!",
   group_deleted: "Group deleted successfully!!!",
+  group_leaved: "Group left successfully!!!",
 };
 
 export const Errors = {
