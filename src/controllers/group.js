@@ -156,6 +156,7 @@ export const getMembers = async (req, res) => {
         res.status(StatusCodes.OK).json({
           status: true,
           data: memberData,
+          totalCount: memberData.length
         });
       } else {
         res.status(StatusCodes.NOT_FOUND).json({
