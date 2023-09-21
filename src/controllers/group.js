@@ -61,6 +61,7 @@ export const editGroup = async (req, res) => {
         res.status(StatusCodes.OK).json({
           status: true,
           message: Responses.group_updated,
+          data: resp,
         });
       }
     } else {
@@ -133,6 +134,32 @@ export const getGroup = async (req, res) => {
     return new ServerException(Errors.internal_error).get(res);
   }
 };
+export const getGroupDetails = async (req, res) => {
+  try {
+    let { id = "" } = req.params;
+    if (id) {
+      const group = await getGroupById(id);
+      if (group) {
+        res.status(StatusCodes.OK).json({
+          status: true,
+          data: group,
+        });
+      } else {
+        res.status(StatusCodes.NOT_FOUND).json({
+          status: false,
+          message: `Group ${Responses.not_found}`,
+        });
+      }
+    } else {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        status: false,
+        message: `${Responses.kindly_provide} group id`,
+      });
+    }
+  } catch (error) {
+    return new ServerException(Errors.internal_error).get(res);
+  }
+};
 export const getMembers = async (req, res) => {
   try {
     let { id } = req.params;
@@ -156,7 +183,7 @@ export const getMembers = async (req, res) => {
         res.status(StatusCodes.OK).json({
           status: true,
           data: memberData,
-          totalCount: memberData.length
+          totalCount: memberData.length,
         });
       } else {
         res.status(StatusCodes.NOT_FOUND).json({
@@ -185,7 +212,9 @@ export const leaveGroup = async (req, res) => {
         let payload = {};
         const uidObjectId = new mongoose.Types.ObjectId(uid);
         // Filter out the member with the specified uid
-        payload["members"] = group.members.filter((member) => member.toString() !== uidObjectId.toString());
+        payload["members"] = group.members.filter(
+          (member) => member.toString() !== uidObjectId.toString()
+        );
         console.log(payload);
         const resp = await updateGroup(filter, payload);
         if (resp) {

@@ -39,6 +39,8 @@ export const createGroup = (values) =>
   new Group(values).save().then((group) => group.toObject());
 
 export const updateGroup = async (filter, updatedData) =>
-  await Group.updateOne(filter, updatedData).exec();
+  await Group.findOneAndUpdate(filter, updatedData, { new: true }).then(
+    (group) => group.toObject()
+  );
 export const deleteGroupById = async (id) =>
   await Group.deleteOne({ _id: id }).exec();

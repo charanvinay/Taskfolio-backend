@@ -1,7 +1,12 @@
 import bcrypt from "bcrypt";
 import { Errors, Responses } from "../Responses/response.js";
 import { ExistsException, ServerException } from "../exceptions/exception.js";
-import { createUser, getUserByEmail, getUserById } from "../models/user.js";
+import {
+  createUser,
+  getUserByEmail,
+  getUserById,
+  getUsers,
+} from "../models/user.js";
 import {
   validatePayload,
   generateToken,
@@ -126,6 +131,32 @@ export const getUserDetails = async (req, res) => {
     }
   } catch (error) {
     console.error("Error logging in user:", error);
+    return new ServerException(Errors.internal_error).get(res);
+  }
+};
+export const getAllUsers = async (req, res) => {
+  let { fullName = "" } = req.query;
+  let filter = { fullName: { $regex: fullName, $options: "i" } };
+  try {
+    let users = await getUsers(filter);
+    if (users && users.length > 0) {
+      res.status(StatusCodes.OK).json({
+        status: true,
+        data: users.map((user) => {
+          let { _id, fullName, email } = user;
+          return {
+            _id,
+            fullName,
+            email,
+          };
+        }),
+      });
+    } else {
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ status: false, message: `Users ${Responses.not_found}` });
+    }
+  } catch (error) {
     return new ServerException(Errors.internal_error).get(res);
   }
 };
