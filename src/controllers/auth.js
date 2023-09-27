@@ -108,7 +108,7 @@ export const login = async (req, res) => {
 };
 export const getUserDetails = async (req, res) => {
   try {
-    let { id } = req.query;
+    let { id } = req.params;
     let { isValid, invalidKey } = validatePayload(id);
     if (isValid) {
       let loginUser = await getUserById(id);

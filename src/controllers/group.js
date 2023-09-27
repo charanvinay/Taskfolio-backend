@@ -25,6 +25,9 @@ export const addGroup = async (req, res) => {
         res.status(StatusCodes.OK).json({
           status: true,
           message: Responses.group_created,
+          data: {
+            _id: savedGroup._id,
+          }
         });
       }
     } else {
@@ -52,9 +55,9 @@ export const editGroup = async (req, res) => {
       }
       if (members && members.length) {
         const uniqueMembers = members.filter(
-          (member) => !group.members.includes(member)
+          (member) => !group.members.map(gm=>gm.toString()).includes(member)
         );
-        payload["members"] = [...group.members, ...uniqueMembers];
+        payload["members"] = uniqueMembers;
       }
       const resp = await updateGroup(filter, payload);
       if (resp) {
