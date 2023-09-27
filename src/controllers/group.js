@@ -57,7 +57,7 @@ export const editGroup = async (req, res) => {
         const uniqueMembers = members.filter(
           (member) => !group.members.map(gm=>gm.toString()).includes(member)
         );
-        payload["members"] = uniqueMembers;
+        payload["members"] = [...group.members, ...uniqueMembers];
       }
       const resp = await updateGroup(filter, payload);
       if (resp) {
