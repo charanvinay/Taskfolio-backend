@@ -9,7 +9,7 @@ export const CONSTANTS = {
   ACCESS_TOKEN: "access_token",
   REFRESH_TOKEN: "refresh_token",
   PAGE: 1,
-  PAGE_SIZE: 10
+  PAGE_SIZE: 20
 };
 
 export const LABELS={
