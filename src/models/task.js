@@ -17,6 +17,9 @@ const TaskSchema = new Schema(
     formName: {
       type: String,
     },
+    status: {
+      type: String,
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

@@ -13,8 +13,8 @@ const { PAGE, PAGE_SIZE } = CONSTANTS;
 
 export const addTask = async (req, res) => {
   try {
-    const { title, type, createdBy, groupId, formName, date } = req.body;
-    const payload = { title, type, createdBy, groupId, formName, date };
+    const { title, type, createdBy, groupId, formName, status, date } = req.body;
+    const payload = { title, type, createdBy, groupId, formName, status, date };
     const { isValid, invalidKey } = validatePayload(payload);
     if (isValid) {
       const group = await getGroupById(groupId);
@@ -46,8 +46,8 @@ export const addTask = async (req, res) => {
 export const editTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, type, createdBy, groupId, formName, date } = req.body;
-    const payload = { title, type, createdBy, groupId, formName, date };
+    const { title, type, createdBy, groupId, formName, status, date } = req.body;
+    const payload = { title, type, createdBy, groupId, formName, status, date };
     const { isValid, invalidKey } = validatePayload(payload);
     if (isValid) {
       const group = await getGroupById(groupId);
