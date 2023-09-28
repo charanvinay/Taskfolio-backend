@@ -51,7 +51,9 @@ export const createTask = (values) =>
   new Task(values).save().then((task) => task.toObject());
 
 export const updateTask = async (filter, updatedData) =>
-  await Task.updateOne(filter, updatedData).exec();
+  await Task.findOneAndUpdate(filter, updatedData, { new: true }).then((task) =>
+    task.toObject()
+  );
 export const deleteTaskById = async (filter) =>
   await Task.deleteOne(filter).exec();
 

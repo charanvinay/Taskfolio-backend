@@ -5,7 +5,7 @@ const router = Router();
 
 router.post("/", authenticateToken, addTask);
 router.put("/:id", authenticateToken, editTask);
-router.delete("/", authenticateToken, deleteTask);
+router.delete("/:groupId/:id", authenticateToken, deleteTask);
 router.get("/", authenticateToken, getTask)
 router.get("/getFormNames", authenticateToken, getFormNames)
 
