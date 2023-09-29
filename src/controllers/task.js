@@ -91,7 +91,6 @@ export const deleteTask = async (req, res) => {
   try {
     if (isValid) {
       const group = await getGroupById(groupId);
-      console.log(group);
       if (group && group["_id"]) {
         let filter = { _id: id, groupId };
         const tasks = await getTasks(filter);
@@ -126,15 +125,17 @@ export const deleteTask = async (req, res) => {
   }
 };
 export const getTask = async (req, res) => {
-  let { title = "", groupId = "", ...keys } = req.query;
+  let { title = "", groupId = "", ...params } = req.query;
   if (Boolean(groupId)) {
     const page = parseInt(req.query["page"]) || PAGE;
     const pageSize = parseInt(req.query["pageSize"]) || PAGE_SIZE;
     const skip = (page - 1) * pageSize;
     const pagination = { skip, limit: pageSize };
-    let validKeys = Object.keys(keys).reduce((acc, curr) => {
-      if (keys[curr]) {
-        acc[curr] = keys[curr];
+    let keys = Object.keys(params);
+    keys = keys.filter(key=> Object.keys(LABELS["TASK"]).includes(key))
+    let validKeys = keys.reduce((acc, curr) => {
+      if (params[curr]) {
+        acc[curr] = params[curr];
       }
       return acc;
     }, {});
@@ -143,6 +144,10 @@ export const getTask = async (req, res) => {
       ...validKeys,
       title: { $regex: title, $options: "i" },
     };
+    if(params["from"] && params["to"]){
+      let {from, to} = params;
+      filter["date"] = { $gte: from, $lte: to };
+    }
     try {
       const tasks = await getTasks(filter, pagination);
       if (tasks) {
@@ -158,6 +163,7 @@ export const getTask = async (req, res) => {
         });
       }
     } catch (error) {
+      console.log(error);
       return new ServerException(Errors.internal_error).get(res);
     }
   } else {
