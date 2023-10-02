@@ -22,10 +22,12 @@ const {
 } = CONSTANTS;
 export const registerUser = async (req, res) => {
   try {
-    const { fullName, email, password } = req.body;
-    const payload = { fullName, email, password };
+    let { fullName, email, password } = req.body;
+    let payload = { fullName, email, password };
     let { isValid, invalidKey } = validatePayload(payload);
     if (isValid) {
+      email = email.toLowerCase()
+      payload["email"] = email.toLowerCase();
       const existingUser = await getUserByEmail(email);
       if (existingUser) {
         return new ExistsException(Responses.user_exists).get(res);
@@ -67,8 +69,11 @@ export const registerUser = async (req, res) => {
 export const login = async (req, res) => {
   try {
     let { email, password } = req.body;
-    let { isValid, invalidKey } = validatePayload({ email, password });
+    let payload = { email, password };
+    let { isValid, invalidKey } = validatePayload(payload);
     if (isValid) {
+      email = email.toLowerCase()
+      payload["email"] = email.toLowerCase();
       let loginUser = await getUserByEmail(email);
       if (Boolean(loginUser)) {
         const { _id } = loginUser;
@@ -78,8 +83,8 @@ export const login = async (req, res) => {
             loginUser.password
           );
           if (isPasswordMatched) {
-            const accessToken = generateToken(req.body, ACCESS_TOKEN);
-            const refreshToken = generateToken(req.body, REFRESH_TOKEN);
+            const accessToken = generateToken(payload, ACCESS_TOKEN);
+            const refreshToken = generateToken(payload, REFRESH_TOKEN);
             res.cookie(ACCESS_TOKEN, accessToken, {
               httpOnly: true,
               maxAge: ACCESS_TOKEN_EXP_IN_MS,

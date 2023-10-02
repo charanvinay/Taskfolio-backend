@@ -7,6 +7,7 @@ const UserSchema = new Schema(
       required: true,
       max: 50,
       unique: true,
+      collation: { locale: 'en', strength: 2 },
     },
     fullName: {
       type: String,
