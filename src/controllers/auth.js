@@ -36,11 +36,23 @@ export const registerUser = async (req, res) => {
         ...payload,
         password: hashedPassword,
       });
-      res.status(StatusCodes.OK).json({
-        status: true,
-        message: Responses.user_create_success,
-        data: savedUser,
-      });
+      if (savedUser) {
+        const accessToken = generateToken({ email, password }, ACCESS_TOKEN);
+        const refreshToken = generateToken({ email, password }, REFRESH_TOKEN);
+        res.cookie(ACCESS_TOKEN, accessToken, {
+          httpOnly: true,
+          maxAge: ACCESS_TOKEN_EXP_IN_MS,
+        });
+        res.cookie(REFRESH_TOKEN, refreshToken, {
+          httpOnly: true,
+          maxAge: REFRESH_TOKEN_EXP_IN_MS,
+        });
+        res.status(StatusCodes.OK).json({
+          status: true,
+          message: Responses.user_create_success,
+          data: { accessToken, userData: savedUser },
+        });
+      }
     } else {
       res.status(StatusCodes.BAD_REQUEST).json({
         status: false,
