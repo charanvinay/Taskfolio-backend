@@ -33,7 +33,11 @@ const TaskSchema = new Schema(
   },
   { timestamps: true }
 );
-
+// Create indexes for fields used in filtering tasks
+TaskSchema.index({ date: 1 });
+TaskSchema.index({ createdBy: 1 });
+TaskSchema.index({ groupId: 1 });
+TaskSchema.index({ groupId: 1, createdBy: 1, date: 1 });
 const Task = mongoose.model("Task", TaskSchema);
 
 export const getTasks = (filter, pagination) => {

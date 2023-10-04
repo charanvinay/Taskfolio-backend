@@ -23,7 +23,9 @@ const UserSchema = new Schema(
   },
   { timestamps: true }
 );
-
+UserSchema.index({ email: 1 });
+UserSchema.index({ fullName: 1 });
+UserSchema.index({ email: 1, fullName: 1 });
 const User = mongoose.model("User", UserSchema);
 
 export const getUsers = (filter) => User.find(filter).exec();

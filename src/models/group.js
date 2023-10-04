@@ -21,7 +21,10 @@ const GroupSchema = new Schema(
   },
   { timestamps: true }
 );
-
+GroupSchema.index({ title: 1 });
+GroupSchema.index({ members: 1 });
+GroupSchema.index({ createdBy: 1 });
+GroupSchema.index({ title: 1, createdBy: 1, members: 1 });
 const Group = mongoose.model("Group", GroupSchema);
 
 export const getGroups = (filter, pagination) => {
