@@ -20,6 +20,7 @@ export const LABELS={
     createdBy: "created by user id",
     groupId: "group id",
     formName: "form name",
+    assignedTo: "assigned to",
     status: "task status",
     date: "task date",
   },

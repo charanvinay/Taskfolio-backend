@@ -9,13 +9,31 @@ import { StatusCodes, validatePayload } from "../services";
 import { ServerException } from "../exceptions/exception";
 import { CONSTANTS, LABELS } from "../services/constants";
 import { getGroupById } from "../models/group";
+import { getUserById } from "../models/user";
 const { PAGE, PAGE_SIZE } = CONSTANTS;
 
 export const addTask = async (req, res) => {
   try {
-    const { title, type, createdBy, groupId, formName, status, date } =
-      req.body;
-    const payload = { title, type, createdBy, groupId, formName, status, date };
+    const {
+      title,
+      type,
+      createdBy,
+      groupId,
+      formName,
+      assignedTo,
+      status,
+      date,
+    } = req.body;
+    const payload = {
+      title,
+      type,
+      createdBy,
+      groupId,
+      formName,
+      assignedTo,
+      status,
+      date,
+    };
     const { isValid, invalidKey } = validatePayload(payload);
     if (isValid) {
       const group = await getGroupById(groupId);
@@ -47,8 +65,17 @@ export const addTask = async (req, res) => {
 export const editTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, type, groupId, formName, status, date } = req.body;
-    const payload = { title, type, groupId, formName, status, date };
+    const { title, type, groupId, formName, assignedTo, status, date } =
+      req.body;
+    const payload = {
+      title,
+      type,
+      groupId,
+      formName,
+      assignedTo,
+      status,
+      date,
+    };
     const { isValid, invalidKey } = validatePayload(payload);
     if (isValid) {
       const group = await getGroupById(groupId);
@@ -132,7 +159,7 @@ export const getTask = async (req, res) => {
     const skip = (page - 1) * pageSize;
     const pagination = { skip, limit: pageSize };
     let keys = Object.keys(params);
-    keys = keys.filter(key=> Object.keys(LABELS["TASK"]).includes(key))
+    keys = keys.filter((key) => Object.keys(LABELS["TASK"]).includes(key));
     let validKeys = keys.reduce((acc, curr) => {
       if (params[curr]) {
         acc[curr] = params[curr];
@@ -144,16 +171,33 @@ export const getTask = async (req, res) => {
       ...validKeys,
       title: { $regex: title, $options: "i" },
     };
-    if(params["from"] && params["to"]){
-      let {from, to} = params;
+    if (params["from"] && params["to"]) {
+      let { from, to } = params;
       filter["date"] = { $gte: from, $lte: to };
     }
     try {
       const tasks = await getTasks(filter, pagination);
       if (tasks) {
+        const tasksData = await Promise.all(
+          tasks.map(async (task) => {
+            let { createdBy } = task;
+            const user = await getUserById(createdBy);
+            if (user) {
+              let { fullName, email } = user;
+              return {
+                ...task.toObject(),
+                createdByData: {
+                  _id: createdBy,
+                  fullName,
+                  email,
+                },
+              };
+            }
+          })
+        );
         res.status(StatusCodes.OK).json({
           status: true,
-          data: tasks,
+          data: tasksData,
           totalCount: tasks.length,
         });
       } else {

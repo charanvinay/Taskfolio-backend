@@ -25,6 +25,11 @@ const TaskSchema = new Schema(
       ref: "User",
       required: true,
     },
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     groupId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Group",
