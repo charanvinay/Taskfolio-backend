@@ -1,7 +1,7 @@
 
 export const convertDaysToMS = (days) => days * 86400000;
 export const CONSTANTS = {
-  ACCESS_TOKEN_EXP: "1d",
+  ACCESS_TOKEN_EXP: "3d",
   ACCESS_TOKEN_EXP_IN_MS: convertDaysToMS(1),
   REFRESH_TOKEN_EXP: "7d",
   REFRESH_TOKEN_EXP_IN_MS: convertDaysToMS(7),
