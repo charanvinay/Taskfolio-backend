@@ -3,7 +3,7 @@ import { CONSTANTS } from "./constants.js";
 import jwt from "jsonwebtoken";
 
 // this function will accept the payload and tells whether the payload is valid or not
-const { ACCESS_TOKEN_EXP, REFRESH_TOKEN_EXP } = CONSTANTS;
+const { ACCESS_TOKEN_EXP, REFRESH_TOKEN_EXP, RESET_TOKEN_EXP } = CONSTANTS;
 export const validatePayload = (payload) => {
   for (let key in payload) {
     const value = payload[key];
@@ -29,6 +29,7 @@ export const generateToken = (payload, type) => {
   const expiration = {
     access_token: ACCESS_TOKEN_EXP,
     refresh_token: REFRESH_TOKEN_EXP,
+    reset_token: RESET_TOKEN_EXP
   };
   const secretkey = process.env.SECRET_KEY;
   const token = jwt.sign(payload, secretkey, {

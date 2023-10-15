@@ -3,6 +3,7 @@ export const Responses = {
   user_create_success: "User registered successfully!!!",
   user_update_success: "Details updated successfully!!!",
   user_login_success: "Logged in successfully!!!",
+  reset_link_success: "Sent reset link successfully!!!",
   invalid_password: "Invalid password",
   invalid_participants: "Invalid participants list",
   enter_valid: "Please enter a valid",
