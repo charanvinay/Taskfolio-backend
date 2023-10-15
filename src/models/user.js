@@ -20,6 +20,10 @@ const UserSchema = new Schema(
       required: true,
       min: 5,
     },
+    copyStyle: {
+      type: String,
+      default: "none"
+    },
   },
   { timestamps: true }
 );
@@ -34,5 +38,8 @@ export const getUserById = (id) => User.findOne({ _id: id });
 
 export const createUser = (values) =>
   new User(values).save().then((user) => user.toObject());
-
+export const updateUser = async (filter, updatedData) =>
+  await User.findOneAndUpdate(filter, updatedData, { new: true }).then((user) =>
+    user.toObject()
+  );
 export default User;

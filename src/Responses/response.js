@@ -1,6 +1,7 @@
 export const Responses = {
   user_exists: "User already exists",
   user_create_success: "User registered successfully!!!",
+  user_update_success: "Details updated successfully!!!",
   user_login_success: "Logged in successfully!!!",
   invalid_password: "Invalid password",
   invalid_participants: "Invalid participants list",

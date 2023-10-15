@@ -6,6 +6,7 @@ import {
   getUserByEmail,
   getUserById,
   getUsers,
+  updateUser,
 } from "../models/user.js";
 import {
   validatePayload,
@@ -26,7 +27,7 @@ export const registerUser = async (req, res) => {
     let payload = { fullName, email, password };
     let { isValid, invalidKey } = validatePayload(payload);
     if (isValid) {
-      email = email.toLowerCase()
+      email = email.toLowerCase();
       payload["email"] = email.toLowerCase();
       const existingUser = await getUserByEmail(email);
       if (existingUser) {
@@ -72,7 +73,7 @@ export const login = async (req, res) => {
     let payload = { email, password };
     let { isValid, invalidKey } = validatePayload(payload);
     if (isValid) {
-      email = email.toLowerCase()
+      email = email.toLowerCase();
       payload["email"] = email.toLowerCase();
       let loginUser = await getUserByEmail(email);
       if (Boolean(loginUser)) {
@@ -185,5 +186,38 @@ export const logout = async (req, res) => {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ message: Errors.internal_error });
+  }
+};
+
+export const update = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const payload = req.body;
+    const { isValid, invalidKey } = validatePayload(payload);
+    let filter = { _id: id };
+    if (isValid) {
+      const user = await getUserById(id);
+      if (user && user["_id"]) {
+        const savedUser = await updateUser(filter, payload);
+        if (savedUser) {
+          res.status(StatusCodes.OK).json({
+            status: true,
+            message: Responses.user_update_success,
+            data: savedUser
+          });
+        }
+      } else {
+        res
+          .status(StatusCodes.NOT_FOUND)
+          .json({ status: false, message: `User ${Responses.not_found}` });
+      }
+    } else {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        status: false,
+        message: "Invalid request",
+      });
+    }
+  } catch (error) {
+    return new ServerException(Errors.internal_error).get(res);
   }
 };
