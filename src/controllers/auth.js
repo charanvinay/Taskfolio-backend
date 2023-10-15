@@ -546,7 +546,7 @@ export const forgotPassword = async (req, res) => {
                                     <p>
                                       If you did not request a password reset, please ignore
                                       this email or
-                                      <a href="${process.env.user}">contact support</a> if
+                                      <a href="mailto:${process.env.user}">contact support</a> if
                                       you have questions.
                                     </p>
                                     <p>Thanks, <br />Team Taskfolio</p>
