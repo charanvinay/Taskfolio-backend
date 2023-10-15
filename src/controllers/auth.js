@@ -151,7 +151,10 @@ export const forgotPassword = async (req, res) => {
           });
 
           var mailOptions = {
-            from: process.env.USER,
+            from: {
+              name: "Taskfolio",
+              address:process.env.USER
+            },
             to: email,
             subject: "Link to reset your Password",
             // text: link,
